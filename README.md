@@ -16,3 +16,8 @@ pip install -r requirements.txt
 ```
 ./read-secret.py -c <mid-clientid> -v <keyvault-url> -s <secret-name>
 ```
+
+##### Blob Access
+```
+./read-blob.py -c <clientid> -s <storageaccount-url> -b <blob-name> -f <filename>
+```
