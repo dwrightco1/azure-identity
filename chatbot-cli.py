@@ -3,11 +3,19 @@
 import sys, os, os.path, base64
 from openai import AzureOpenAI
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+import argparse
+
+def _parse_args():
+    ap = argparse.ArgumentParser(sys.argv[0], formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    ap.add_argument("--clientid", "-c",  help="-c <client-id>", required=True, nargs=1)
+    return ap.parse_args()
+
+args = _parse_args()
 
 endpoint = os.getenv("ENDPOINT_URL", "https://eastus.api.cognitive.microsoft.com/")  
 deployment = os.getenv("DEPLOYMENT_NAME", "gpt-35-turbo")
 token_provider = get_bearer_token_provider(  
-    DefaultAzureCredential(),  
+    DefaultAzureCredential(managed_identity_client_id=args.clientid[0]),  
     "https://cognitiveservices.azure.com/.default"  
 )
 
