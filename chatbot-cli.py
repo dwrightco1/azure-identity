@@ -4,31 +4,39 @@ import sys, os, os.path, base64
 from openai import AzureOpenAI
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 import argparse
+from pprint import pprint
+
+# ./chatbot-cli.py -c a9cd6bc8-1eda-4d4b-9426-7b425992dc37 -e https://eastus.api.cognitive.microsoft.com/ -a 2024-05-01-preview -d gpt-35-turbo
 
 def _parse_args():
     ap = argparse.ArgumentParser(sys.argv[0], formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     ap.add_argument("--clientid", "-c",  help="-c <client-id>", required=True, nargs=1)
+    ap.add_argument("--endpointurl", "-e",  help="-e <endpoint-url>", required=True, nargs=1)
+    ap.add_argument("--apiversion", "-a",  help="-a <api-version>", required=True, nargs=1)
+    ap.add_argument("--deployment", "-d",  help="-d <deployment>", required=True, nargs=1)
     return ap.parse_args()
 
 args = _parse_args()
 
-endpoint = os.getenv("ENDPOINT_URL", "https://eastus.api.cognitive.microsoft.com/")  
-deployment = os.getenv("DEPLOYMENT_NAME", "gpt-35-turbo")
 token_provider = get_bearer_token_provider(  
-    DefaultAzureCredential(managed_identity_client_id=args.clientid[0]),  
+    #DefaultAzureCredential(managed_identity_client_id=args.clientid[0]),  
+    DefaultAzureCredential(),
     "https://cognitiveservices.azure.com/.default"  
 )
 
+pprint(vars(token_provider))
+sys.exit(0)
+
 # Initialize Azure OpenAI client with key-based authentication
 client = AzureOpenAI(  
-    azure_endpoint=endpoint,  
+    azure_endpoint=args.endpointurl[0],  
     azure_ad_token_provider=token_provider,  
-    api_version="2024-05-01-preview",  
+    api_version=args.apiversion[0],
 )  
 
 def chat_with_gpt(prompt):
     response = client.chat.completions.create(
-        model = "gpt-35-turbo",
+        model = args.deployment[0],
         messages = [{"role": "user", "content": prompt}]
     )
 
