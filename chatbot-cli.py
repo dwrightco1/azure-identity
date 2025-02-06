@@ -6,7 +6,7 @@ from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 import argparse
 from pprint import pprint
 
-# ./chatbot-cli.py -c a9cd6bc8-1eda-4d4b-9426-7b425992dc37 -e https://eastus.api.cognitive.microsoft.com/ -a 2024-05-01-preview -d gpt-35-turbo
+# ./chatbot-cli.py -c 6dc22f88-e3c6-4e28-9318-0b4b20c0d746 -e https://eastus.api.cognitive.microsoft.com/ -a 2024-05-01-preview -d gpt-35-turbo
 
 def _parse_args():
     ap = argparse.ArgumentParser(sys.argv[0], formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -19,13 +19,12 @@ def _parse_args():
 args = _parse_args()
 
 token_provider = get_bearer_token_provider(  
-    #DefaultAzureCredential(managed_identity_client_id=args.clientid[0]),  
-    DefaultAzureCredential(),
+    DefaultAzureCredential(managed_identity_client_id=args.clientid[0]),  
+    #DefaultAzureCredential(),
     "https://cognitiveservices.azure.com/.default"  
 )
 
 pprint(vars(token_provider))
-sys.exit(0)
 
 # Initialize Azure OpenAI client with key-based authentication
 client = AzureOpenAI(  
