@@ -49,20 +49,24 @@ mountpoint=${4}
 rg=${5}
 
 # login to Azure using managed identity
-run_cmd "az login --identity --client-id ${clientid}"
+run_cmd "logging into Azure" "az login --identity --client-id ${clientid}"
 if [ $? -ne 0 ]; then assert "failed to login to Azure"; fi
 
 
 # lookup storage account access key
-accesskey=$(az storage account keys list --account-name ${storageacct} --resource-group ${rg} --query [0].value)
+accesskey=$(az storage account keys list --account-name ${storageacct} --resource-group ${rg} --query [0].value --output tsv)
 if [ $? -ne 0 ]; then assert "failed to get access key for storage account"; fi
 
 # install cifs utilities
-run_cmd "sudo yum install -y cifs-utils"
+run_cmd "installing package: cifs-utils" "sudo yum install -y cifs-utils"
 if [ $? -ne 0 ]; then assert "failed to install cifs utilities"; fi
 
+# create mountpoint
+run_cmd "creating mountpoint" "mkdir -p ${mountpoint}"
+if [ $? -ne 0 ]; then assert "failed to create mountpoint"; fi
+
 # mount storage account share
-run_cmd "sudo mount -t cifs //${storageacct}.file.core.windows.net/${share} <mountpoint> -o username=${storageacct} -o password=${accesskey}"
+run_cmd "mounting cifs share" "sudo mount -t cifs //${storageacct}.file.core.windows.net/${share} ${mountpoint} -o username=${storageacct} -o password=${accesskey}"
 if [ $? -ne 0 ]; then assert "failed to mount storage account share"; fi
 
 # exit cleanly
