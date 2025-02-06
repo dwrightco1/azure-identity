@@ -66,7 +66,9 @@ run_cmd "creating mountpoint" "mkdir -p ${mountpoint}"
 if [ $? -ne 0 ]; then assert "failed to create mountpoint"; fi
 
 # mount storage account share
-run_cmd "mounting cifs share" "sudo mount -t cifs //${storageacct}.file.core.windows.net/${share} ${mountpoint} -o username=${storageacct} -o password=${accesskey}"
+uid=$(id -u)
+gid=$(id -g)
+run_cmd "mounting cifs share" "sudo mount -t cifs //${storageacct}.file.core.windows.net/${share} ${mountpoint} -o uid=${uid},gid=${gid} -o username=${storageacct} -o password=${accesskey}"
 if [ $? -ne 0 ]; then assert "failed to mount storage account share"; fi
 
 # exit cleanly
