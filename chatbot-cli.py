@@ -1,10 +1,12 @@
-#!/usr/bin/env python3
+#!/bin/env python3
 
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 import sys, os, os.path, base64
 from openai import AzureOpenAI
 import argparse
+
+subscription_key = ""
 
 def _parse_args():
     ap = argparse.ArgumentParser(sys.argv[0], formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -19,14 +21,11 @@ def _parse_args():
 def get_secret():
     credential = DefaultAzureCredential(managed_identity_client_id=args.clientid[0])
     client = SecretClient(vault_url=args.vault[0], credential=credential)
-
     secret = client.get_secret(args.secret[0])
-    secret_value = secret.value
-    sys.stdout.write("secret value = {}\n".format(secret_value))
+    return(secret.value)
 
 args = _parse_args()
 
-subscription_key = "2f64f1dfa5c948ac99ac7b8d0c43b40f"
 
 # Initialize OpenAI session
 client = AzureOpenAI(
@@ -44,13 +43,8 @@ def chat_with_gpt(prompt):
     return(response.choices[0].message.content.strip())
 
 if __name__ == "__main__":
-#    try:
-    get_secret()
-#    except Exception as e:
-#        print(f"Error retrieving OpenAI access key from key vault: {e}")
-#        sys.exit(1)
-
     # Start chatbot prompt loop
+    subscription_key = get_secret()
     while True:
         user_input = input("Ask a question: ")
         if user_input.lower() in ["quit","q"]:
