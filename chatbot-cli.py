@@ -2,8 +2,8 @@
 
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-import sys, os, os.path, base64
 from openai import AzureOpenAI
+import sys, os, os.path, base64
 import argparse
 
 subscription_key = ""
@@ -24,16 +24,6 @@ def get_secret():
     secret = client.get_secret(args.secret[0])
     return(secret.value)
 
-args = _parse_args()
-
-
-# Initialize OpenAI session
-client = AzureOpenAI(
-    azure_endpoint=args.endpointurl[0],
-    api_key=subscription_key,
-    api_version=args.apiversion[0],
-)
-
 def chat_with_gpt(prompt):
     response = client.chat.completions.create(
         model = args.deployment[0],
@@ -42,9 +32,22 @@ def chat_with_gpt(prompt):
 
     return(response.choices[0].message.content.strip())
 
+
+args = _parse_args()
+
 if __name__ == "__main__":
-    # Start chatbot prompt loop
+
+    # Read OpenAI access key from keyvault
     subscription_key = get_secret()
+
+    # Initialize OpenAI session
+    client = AzureOpenAI(
+        azure_endpoint=args.endpointurl[0],
+        api_key=subscription_key,
+        api_version=args.apiversion[0],
+    )
+
+    # Start chatbot
     while True:
         user_input = input("Ask a question: ")
         if user_input.lower() in ["quit","q"]:
