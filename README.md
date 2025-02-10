@@ -21,3 +21,17 @@ pip install -r requirements.txt
 ```
 ./read-blob.py -c <clientid> -s <storageaccount-url> -b <blob-name> -f <filename>
 ```
+
+##### Demonstrate using the managed identity to authenticate to OpenAI (by reading accesskey from key vault)
+```
+./chatbot-cli.py -c <mid-clientid> -v <vault-url> -s openai-key -e https://eastus.api.cognitive.microsoft.com/ -a 2024-05-01-preview -d gpt-35-turbo
+```
+
+> NOTE: Before running the command above, you'll need to add a vault secret named `openai-key` and initialize its value with the OpenAI access key.
+
+##### Demonstrate using the managed identity to mount a CIFS share from a storage account
+```
+./mount-storage.sh <mid-clientid> <storageacct-name> <share-name> <pointpoint> <resource-group>
+```
+
+> NOTE: You will need to assign the `Contributor` RBAC role on the storage account for the managed identity.
